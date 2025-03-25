@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { BackButton } from "@/components/back-button"
 import { MapComponent } from "@/components/map-component"
 import { Button } from "@/components/ui/button"
 import { Timer } from "@/components/ui/timer"
@@ -79,6 +80,7 @@ export default function TrackPage() {
 
   return (
     <div className="container mx-auto p-4 space-y-4">
+      <BackButton className="mt-4" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>

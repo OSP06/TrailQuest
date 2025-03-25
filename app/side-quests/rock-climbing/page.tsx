@@ -1,4 +1,5 @@
 import { Award, ChevronRight, Filter, MapPin, Mountain, Search } from "lucide-react"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -62,6 +63,7 @@ export default function RockClimbingQuestPage() {
 
   return (
     <div className="container max-w-screen-xl space-y-8 py-6 md:py-10">
+      <BackButton className="mt-4" />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Rock Climbing Quests</h1>
@@ -258,4 +260,3 @@ export default function RockClimbingQuestPage() {
     </div>
   )
 }
-

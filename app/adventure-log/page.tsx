@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { BackButton } from "@/components/back-button"
 import { Award, Calendar, Filter, Mountain, Plus, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -52,7 +53,7 @@ export default function AdventureLogPage() {
   ]
 
   return (
-    <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10">
+    <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 relative">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Adventure Log</h1>

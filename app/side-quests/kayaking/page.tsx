@@ -1,4 +1,7 @@
+"use client"
+import { useRouter } from "next/navigation"
 import { Award, ChevronRight, Filter, MapPin, Search, Waves } from "lucide-react"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -7,6 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { MapComponent } from "@/components/map-component"
 
 export default function KayakingQuestPage() {
+  const router = useRouter()
   // Sample kayaking quests
   const quests = [
     {
@@ -61,15 +65,16 @@ export default function KayakingQuestPage() {
   ]
 
   return (
-    <div className="container max-w-screen-xl space-y-8 py-6 md:py-10">
+    <div className="container max-w-screen-xl space-y-8 py-6 md:py-10 relative">
+      <BackButton className="mt-4" path="/main" />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Kayaking Quests</h1>
           <p className="text-muted-foreground">Complete quests to earn XP and badges</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => router.push("/track/tracking_kayaking")}>
           <Waves className="h-4 w-4" />
-          <span>Start Tracking</span>
+          <span>Start Kayaking</span>
         </Button>
       </div>
 
@@ -246,4 +251,3 @@ export default function KayakingQuestPage() {
     </div>
   )
 }
-

@@ -1,5 +1,8 @@
+"use client"
 import Link from "next/link"
-import { ArrowRight, Award, ChevronRight, Droplet, Lock, MapPin, Mountain, Waves, Zap, Crown } from "lucide-react"
+import { ArrowRight, Award, ChevronRight, Droplet, Lock, MapPin, Mountain, Waves, Zap, Crown, Heart, MessageCircle } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DesktopNavigation } from "@/components/desktop-navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -13,8 +16,10 @@ export default function Home() {
   const User = useUser()
   console.log(User)
   return (
-    <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10">
-      <div className="flex flex-col gap-4 md:flex-row">
+    <div className="flex">
+      <DesktopNavigation />
+      <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 flex-1">
+        <div className="flex flex-col gap-4 md:flex-row">
         <div className="flex-1 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Welcome back, {User.user?.fullName || 'Adventurer'}</h1>
@@ -180,6 +185,49 @@ export default function Home() {
               <span>Go Hiking</span>
             </Button>
           </Link>
+
+          {/* Recent Adventures Preview */}
+          <div className="space-y-3 mt-4">
+            <h3 className="text-sm font-medium">Recent Adventures</h3>
+            <Link href="/adventure-feed">
+              <Card className="transition-all hover:bg-accent/50">
+                <CardHeader className="p-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/placeholder-user.jpg" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="text-sm font-medium">John Doe</div>
+                      <div className="text-xs text-muted-foreground">2h ago</div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="px-3 pb-3">
+                  <p className="text-sm line-clamp-2">Just completed an amazing hike at Mount Rainier! The views were breathtaking and the weather was perfect.</p>
+                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                    <Mountain className="h-3 w-3" />
+                    <span>Hiking • 8.2 miles</span>
+                  </div>
+                </CardContent>
+                <CardFooter className="px-3 pb-3 pt-0 flex gap-2 text-xs">
+                  <div className="flex items-center gap-1">
+                    <Heart className="h-3 w-3" />
+                    <span>24</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageCircle className="h-3 w-3" />
+                    <span>5</span>
+                  </div>
+                </CardFooter>
+              </Card>
+            </Link>
+            <Link href="/adventure-feed">
+              <Button variant="ghost" size="sm" className="w-full text-xs">
+                View all adventures
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -360,6 +408,7 @@ export default function Home() {
             </div>
           </TabsContent>
         </Tabs>
+      </div>
       </div>
     </div>
   )

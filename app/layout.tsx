@@ -2,6 +2,7 @@ import type { Metadata } from "next/types"
 import { Inter } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ThemeProvider } from "@/components/theme-provider"
+import { MobileNavigation } from "@/components/mobile-navigation"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -31,6 +32,9 @@ export default function RootLayout({
         <body className={`${inter.className} antialiased`}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             {children}
+            <div className="md:hidden">
+              <MobileNavigation />
+            </div>
           </ThemeProvider>
         </body>
       </html>

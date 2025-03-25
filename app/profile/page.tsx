@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import { BackButton } from "@/components/back-button"
 import {
   Award,
   Calendar,
@@ -288,7 +289,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10">
+    <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 relative">
       {/* Confetti celebration */}
       <ConfettiCelebration active={showConfetti} onComplete={handleConfettiComplete} />
 
@@ -585,4 +586,3 @@ export default function ProfilePage() {
     </div>
   )
 }
-

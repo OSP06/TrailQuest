@@ -1,4 +1,8 @@
+"use client"
+
+import { useRouter } from "next/navigation"
 import { Award, ChevronRight, Filter, MapPin, Droplet, Search } from "lucide-react"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -7,6 +11,7 @@ import { Progress } from "@/components/ui/progress"
 import { MapComponent } from "@/components/map-component"
 
 export default function CliffJumpingQuestPage() {
+  const router = useRouter()
   // Sample cliff jumping quests
   const quests = [
     {
@@ -62,12 +67,18 @@ export default function CliffJumpingQuestPage() {
 
   return (
     <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10">
+      <BackButton className="mt-4" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Cliff Jumping Quests</h1>
-          <p className="text-muted-foreground">Complete quests to earn XP and badges</p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Cliff Jumping Quests</h1>
+            <p className="text-muted-foreground">Complete quests to earn XP and badges</p>
+          </div>
         </div>
-        <Button className="gap-2 w-full sm:w-auto">
+        <Button 
+          className="gap-2 w-full sm:w-auto"
+          onClick={() => router.push('/track/track_log_jump')}
+        >
           <Droplet className="h-4 w-4" />
           <span>Log Jump</span>
         </Button>
@@ -202,7 +213,12 @@ export default function CliffJumpingQuestPage() {
                 <Button variant="outline" size="sm" className="w-full">
                   View Details
                 </Button>
-                <Button variant="outline" size="sm" className="w-full">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => router.push('/track/track_log_jump')}
+                >
                   Log Jump
                 </Button>
               </CardFooter>
@@ -250,4 +266,3 @@ export default function CliffJumpingQuestPage() {
     </div>
   )
 }
-

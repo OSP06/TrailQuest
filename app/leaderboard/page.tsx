@@ -1,4 +1,5 @@
 import { Award, Globe, MapPin, Mountain, Search, Users } from "lucide-react"
+import { BackButton } from "@/components/back-button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -85,7 +86,7 @@ export default function LeaderboardPage() {
   ]
 
   return (
-    <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10">
+    <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 relative">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Leaderboard</h1>
         <p className="text-muted-foreground">See how you rank against other adventurers</p>
@@ -284,4 +285,3 @@ export default function LeaderboardPage() {
     </div>
   )
 }
-

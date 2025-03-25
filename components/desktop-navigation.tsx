@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, BookOpen, Trophy, User, Crown, Compass, Mountain, Waves, MountainIcon, Droplet } from "lucide-react"
+import { Home, BookOpen, Trophy, User, Users, Crown, Compass, Mountain, Waves, MountainIcon, Droplet } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -15,7 +15,7 @@ export function DesktopNavigation() {
 
   const routes = [
     {
-      href: "/(main)",
+      href: "/main",
       icon: Home,
       title: "Home",
     },
@@ -33,6 +33,11 @@ export function DesktopNavigation() {
       href: "/adventure-log",
       icon: BookOpen,
       title: "Adventure Log",
+    },
+    {
+      href: "/adventure-feed",
+      icon: Users,
+      title: "Adventure Feed",
     },
     {
       href: "/leaderboard",
@@ -75,7 +80,7 @@ export function DesktopNavigation() {
   return (
     <div
       className={cn(
-        "hidden border-r bg-card/40 md:flex md:flex-col transition-all duration-300",
+        "hidden border-r bg-background md:flex md:flex-col transition-all duration-300",
         isCollapsed ? "md:w-20" : "md:w-64",
       )}
     >
@@ -123,7 +128,7 @@ export function DesktopNavigation() {
                         href={child.href}
                         className={cn(
                           "flex items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                          pathname === child.href ? "bg-accent text-accent-foreground" : "transparent",
+                          pathname === child.href ? "bg-primary/10 text-primary border-l-2 border-primary" : "transparent",
                         )}
                       >
                         <child.icon className="h-4 w-4" />
@@ -134,12 +139,12 @@ export function DesktopNavigation() {
                 )}
               </div>
             ) : (
-              <Link
+                <Link
                 key={i}
                 href={route.href}
                 className={cn(
                   "flex items-center gap-2 rounded-md transition-colors hover:bg-accent hover:text-accent-foreground",
-                  pathname === route.href ? "bg-accent text-accent-foreground" : "transparent",
+                  pathname === route.href ? "bg-primary/10 text-primary border-l-2 border-primary" : "transparent",
                   isCollapsed ? "justify-center px-2 py-2" : "px-4 py-2",
                 )}
                 title={isCollapsed ? route.title : undefined}
