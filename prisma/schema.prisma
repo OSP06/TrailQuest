@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  createdAt  DateTime  @default(now())
+  lastLogin  DateTime?
+  profile    UserProfile?
+  preferences Preference[]
+  activities Activity[]
+}
+
+model UserProfile {
+  userId          Int      @id
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location        String?
+  lastActivityId  Int?
+  lastInteraction DateTime?
+}
+
+model Preference {
+  id     Int     @id @default(autoincrement())
+  userId Int
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+  weight Float   @default(1.0)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Activity {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityType String
+  timestamp    DateTime  @default(now())
+
+  @@index([userId, timestamp(sort: Desc)])
+}
+
+model AIModel {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  version   String
+  isActive  Boolean   @default(true)
+  recommendations Recommendation[]
+  interactions Interaction[]
+}
+
+model Recommendation {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  modelId     Int
+  model       AIModel   @relation(fields: [modelId], references: [id])
+  generatedAt DateTime  @default(now())
+  expiresAt   DateTime?
+  items       RecommendationItem[]
+
+  @@index([userId, modelId])
+  @@index([expiresAt])
+}
+
+model RecommendationItem {
+  id              Int       @id @default(autoincrement())
+  recommendationId Int
+  recommendation  Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  activityType    String
+  confidence      Float
+  reason          String?
+}
+
+model Interaction {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityId      Int?
+  activity        Activity? @relation(fields: [activityId], references: [id])
+  interactionType String
+  timestamp       DateTime  @default(now())
+  modelId         Int
+  model           AIModel   @relation(fields: [modelId], references: [id])
+
+  @@index([userId, modelId])
+}
+
+model AdventurePost {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  images      AdventureImage[]
+  activityType String
+  location    String?
+  likes       Like[]
+  comments    Comment[]
+}
+
+model AdventureImage {
+  id          Int       @id @default(autoincrement())
+  postId      Int
+  post        AdventurePost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url         String
+  altText     String?
+  isPrimary   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model Like {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    Int
+  post      AdventurePost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@unique([userId, postId])
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    Int
+  post      AdventurePost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime  @default(now())
+}

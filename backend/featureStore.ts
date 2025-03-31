@@ -9,6 +9,11 @@ interface UserFeatures {
   lastInteraction?: string;
   activityCount?: number;
   preferenceWeights?: Record<string, number>;
+  xp?: number;
+  rewards?: string[];
+  achievements?: string[];
+  recommendationsAccepted?: number;
+  [key: string]: any; // Index signature for dynamic properties
 }
 
 export const FeatureStore = {
@@ -28,9 +33,30 @@ export const FeatureStore = {
     return features;
   },
 
-  async updateUserFeatures(userId: string, updates: Partial<UserFeatures>) {
+  async updateUserFeatures(userId: string, updates: Partial<UserFeatures> | { [key: string]: any }) {
     const current = await this.getUserFeatures(userId);
-    const updated = { ...current, ...updates };
+    let updated = { ...current };
+
+    // Handle MongoDB-style operators
+    for (const [key, value] of Object.entries(updates)) {
+      if (key.startsWith('$')) {
+        if (key === '$inc' && typeof value === 'object') {
+          for (const [field, amount] of Object.entries(value)) {
+            updated[field] = (updated[field] || 0) + amount;
+          }
+        } else if (key === '$push' && typeof value === 'object') {
+          for (const [field, item] of Object.entries(value)) {
+            if (!Array.isArray(updated[field])) {
+              updated[field] = [];
+            }
+            updated[field].push(item);
+          }
+        }
+      } else {
+        updated[key] = value;
+      }
+    }
+
     await redis.set(
       `user:${userId}:features`,
       JSON.stringify(updated),

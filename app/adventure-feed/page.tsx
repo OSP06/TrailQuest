@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   Award,
@@ -28,113 +28,63 @@ import { Textarea } from "@/components/ui/textarea"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { CreatePostDialog } from "@/components/create-post-dialog"
 
-// Sample adventure posts data
-const adventurePosts = [
-  {
-    id: 1,
-    user: {
-      name: "Alex Johnson",
-      username: "trailblazer42",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    timestamp: "2 hours ago",
-    content:
-      "Just conquered Mount Si today! The views from the top were absolutely breathtaking. Definitely worth the climb. #MountainMonday #TrailQuest",
-    adventure: {
-      type: "Hiking",
-      location: "Mount Si, North Bend, WA",
-      stats: {
-        distance: "8 miles",
-        elevation: "3,150 ft",
-        time: "3h 45m",
-      },
-      badges: ["Summit Seeker"],
-    },
-    images: ["/placeholder.svg?height=400&width=600"],
-    likes: 42,
-    comments: 7,
-    liked: false,
-  },
-  {
-    id: 2,
-    user: {
-      name: "Jamie Chen",
-      username: "peakseeker",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    timestamp: "Yesterday",
-    content:
-      "Sent my first V5 at the climbing gym today! Been working on this problem for weeks. The crux move was a tricky heel hook to a sloper. So stoked! #RockClimbing #Bouldering",
-    adventure: {
-      type: "Rock Climbing",
-      location: "Seattle Bouldering Project",
-      stats: {
-        grade: "V5",
-        style: "Bouldering",
-        attempts: "12",
-      },
-      badges: ["Boulder Crusher"],
-    },
-    images: ["/placeholder.svg?height=400&width=600"],
-    likes: 38,
-    comments: 5,
-    liked: true,
-  },
-  {
-    id: 3,
-    user: {
-      name: "Taylor Smith",
-      username: "hikerpro",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    timestamp: "3 days ago",
-    content:
-      "Epic day kayaking on Lake Washington! Perfect weather and calm waters. Spotted some seals and even an eagle. Can't wait to go back! #Kayaking #PaddleLife",
-    adventure: {
-      type: "Kayaking",
-      location: "Lake Washington, Seattle, WA",
-      stats: {
-        distance: "5.2 miles",
-        time: "2h 15m",
-        waterCondition: "Calm",
-      },
-      badges: ["Lake Voyager"],
-    },
-    images: ["/placeholder.svg?height=400&width=600", "/placeholder.svg?height=400&width=600"],
-    likes: 29,
-    comments: 3,
-    liked: false,
-  },
-  {
-    id: 4,
-    user: {
-      name: "Jordan Patel",
-      username: "trailrunner",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    timestamp: "1 week ago",
-    content:
-      "Cliff jumping at Blue Lake today was INSANE! 30ft drop and the water was perfect. Managed to pull off a backflip on the last jump! #CliffJumping #Adrenaline",
-    adventure: {
-      type: "Cliff Jumping",
-      location: "Blue Lake, WA",
-      stats: {
-        height: "30 ft",
-        jumps: "5",
-        waterTemp: "68°F",
-      },
-      badges: ["Adrenaline Seeker"],
-    },
-    images: ["/placeholder.svg?height=400&width=600"],
-    likes: 56,
-    comments: 12,
-    liked: false,
-  },
-]
+interface AdventureStats {
+  distance?: string
+  elevation?: string
+  time?: string
+  grade?: string
+  style?: string
+  attempts?: string
+  waterCondition?: string
+  height?: string
+  jumps?: string
+  waterTemp?: string
+}
+
+interface AdventurePost {
+  id: number
+  user: {
+    name: string
+    username: string
+    avatar: string
+  }
+  timestamp: string
+  content: string
+  adventure: {
+    type: string
+    location: string
+    stats: AdventureStats
+    badges?: string[]
+  }
+  images: string[]
+  likes: number
+  comments: number
+  liked: boolean
+}
 
 export default function AdventureFeedPage() {
   const router = useRouter()
-  const [posts, setPosts] = useState(adventurePosts)
+  const [posts, setPosts] = useState<AdventurePost[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('/api/adventure-posts')
+        if (!response.ok) {
+          throw new Error('Failed to fetch posts')
+        }
+        const data = await response.json()
+        setPosts(data)
+      } catch (error) {
+        console.error('Error fetching posts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPosts()
+  }, [])
   const [createPostOpen, setCreatePostOpen] = useState(false)
   const [commentText, setCommentText] = useState("")
   const [expandedComments, setExpandedComments] = useState<number | null>(null)
@@ -439,4 +389,3 @@ export default function AdventureFeedPage() {
     </div>
   )
 }
-

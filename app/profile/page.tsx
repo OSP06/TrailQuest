@@ -1,6 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import type { JSX } from 'react'
+import { fetchRecommendations } from "@/lib/api"
+import { toast } from "@/components/ui/use-toast"
 import { motion } from "framer-motion"
 import { BackButton } from "@/components/back-button"
 import {
@@ -42,19 +45,103 @@ import { ConfettiCelebration } from "@/components/confetti-celebration"
 import { AchievementToast } from "@/components/achievement-toast"
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState("stats")
+  const [activeTab, setActiveTab] = useState<"stats"|"badges"|"rewards"|"devices">("stats")
+  interface Recommendation {
+    activityType: string
+    reason: string
+    confidence: number
+  }
+
+  interface Profile {
+    name: string
+    username: string
+    avatar: string
+    level: number
+    xp: number
+    xpToNextLevel: number
+    joinDate: string
+    location: string
+    bio: string
+    stats: {
+      totalHikes: number
+      totalDistance: number
+      totalElevation: number
+      longestHike: number
+      highestElevation: number
+      averagePace: string
+      totalTime: string
+    }
+    badges: Badge[]
+    rewards: Reward[]
+    devices: Device[]
+  }
+
+  interface Badge {
+    id: string
+    name: string
+    description: string
+    unlocked: boolean
+    icon: JSX.Element
+    bgColor: string
+  }
+
+  interface Reward {
+    id: string
+    name: string
+    description: string
+    unlocked: boolean
+    icon: JSX.Element
+    bgColor: string
+  }
+
+  interface Device {
+    name: string
+    type: string
+    lastSync: string
+  }
+
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [loadingRecs, setLoadingRecs] = useState(false)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loadingProfile, setLoadingProfile] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
-  const [activeReward, setActiveReward] = useState(null)
+  const [activeReward, setActiveReward] = useState<Reward | null>(null)
   const [showToast, setShowToast] = useState(false)
-  const [toastData, setToastData] = useState({
+  const [toastData, setToastData] = useState<{
+    title: string
+    description: string
+    type: "badge" | "reward" | "xp"
+    color: string
+  }>({
     title: "",
     description: "",
     type: "badge",
     color: "",
   })
 
-  // Sample profile data
-  const profile = {
+  // Fetch profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch('/api/profile')
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile')
+        }
+        const data = await response.json()
+        setProfile(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        setLoadingProfile(false)
+      }
+    }
+
+    fetchProfile()
+  }, [])
+
+  // Sample fallback profile data
+  const fallbackProfile = {
     name: "Trail Blazer",
     username: "trailblazer",
     avatar: "/placeholder.svg?height=100&width=100",
@@ -227,13 +314,31 @@ export default function ProfilePage() {
     ],
   }
 
+  // Fetch recommendations when rewards tab is active
+  useEffect(() => {
+    if (activeTab === 'rewards' && !recommendations.length && !loadingRecs) {
+      setLoadingRecs(true)
+      fetchRecommendations()
+        .then(data => setRecommendations(data))
+        .catch(err => {
+          setError(err instanceof Error ? err.message : 'Failed to load recommendations')
+          toast({
+            title: 'Error',
+            description: 'Failed to load recommendations',
+            variant: 'destructive'
+          })
+        })
+        .finally(() => setLoadingRecs(false))
+    }
+  }, [activeTab, recommendations.length, loadingRecs])
+
   // Handle tab change
-  const handleTabChange = (value) => {
+  const handleTabChange = (value: "stats"|"badges"|"rewards"|"devices") => {
     setActiveTab(value)
   }
 
   // Simulate unlocking a badge
-  const unlockBadge = (badge) => {
+  const unlockBadge = (badge: Badge) => {
     if (!badge.unlocked) {
       setShowConfetti(true)
 
@@ -263,7 +368,7 @@ export default function ProfilePage() {
     }
   }, [activeReward])
 
-  const useReward = (reward) => {
+  const useReward = (reward: Reward) => {
     setActiveReward(reward)
   }
 
@@ -287,6 +392,24 @@ export default function ProfilePage() {
   const handleConfettiComplete = () => {
     setShowConfetti(false)
   }
+
+  if (loadingProfile) {
+    return (
+      <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 flex items-center justify-center h-[80vh]">
+        <p>Loading profile...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 flex items-center justify-center h-[80vh]">
+        <p className="text-red-500">{error}</p>
+      </div>
+    )
+  }
+
+  const currentProfile = profile || fallbackProfile
 
   return (
     <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 relative">
@@ -315,34 +438,34 @@ export default function ProfilePage() {
               transition={{ duration: 0.5 }}
             >
               <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-4 border-amber-500">
-                <AvatarImage src={profile.avatar} alt={profile.name} />
-                <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={currentProfile.avatar} alt={currentProfile.name} />
+                <AvatarFallback>{currentProfile.name.charAt(0)}</AvatarFallback>
               </Avatar>
             </motion.div>
-            <CardTitle className="text-xl">{profile.name}</CardTitle>
-            <CardDescription>@{profile.username}</CardDescription>
+            <CardTitle className="text-xl">{currentProfile.name}</CardTitle>
+            <CardDescription>@{currentProfile.username}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 px-4 sm:px-6">
             <XPProgress
-              level={profile.level}
-              currentXP={profile.xp}
-              requiredXP={profile.xpToNextLevel}
+              level={currentProfile.level}
+              currentXP={currentProfile.xp}
+              requiredXP={currentProfile.xpToNextLevel}
               showAnimation={false}
             />
 
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Joined {profile.joinDate}</span>
+                <span>Joined {currentProfile.joinDate}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>{profile.location}</span>
+                <span>{currentProfile.location}</span>
               </div>
             </div>
 
             <div className="pt-2">
-              <p className="text-sm">{profile.bio}</p>
+              <p className="text-sm">{currentProfile.bio}</p>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between px-4 sm:px-6">
@@ -363,7 +486,10 @@ export default function ProfilePage() {
 
         {/* Stats and Badges */}
         <div className="flex-1 space-y-6">
-          <Tabs defaultValue="stats" onValueChange={handleTabChange}>
+          <Tabs 
+            defaultValue="stats" 
+            onValueChange={(value: string) => handleTabChange(value as "stats"|"badges"|"rewards"|"devices")}
+          >
             <TabsList className="w-full sm:w-auto">
               <TabsTrigger value="stats" className="flex-1 sm:flex-initial gap-1">
                 <Mountain className="h-4 w-4" />
@@ -401,7 +527,7 @@ export default function ProfilePage() {
                         <Compass className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">Total Hikes</span>
                       </div>
-                      <p className="text-xl sm:text-2xl font-bold">{profile.stats.totalHikes}</p>
+                      <p className="text-xl sm:text-2xl font-bold">{currentProfile.stats.totalHikes}</p>
                     </motion.div>
                     <motion.div
                       className="space-y-1"
@@ -413,7 +539,7 @@ export default function ProfilePage() {
                         <Footprints className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">Total Distance</span>
                       </div>
-                      <p className="text-xl sm:text-2xl font-bold">{profile.stats.totalDistance} mi</p>
+                      <p className="text-xl sm:text-2xl font-bold">{currentProfile.stats.totalDistance} mi</p>
                     </motion.div>
                     <motion.div
                       className="space-y-1"
@@ -426,7 +552,7 @@ export default function ProfilePage() {
                         <span className="text-sm text-muted-foreground">Total Elevation</span>
                       </div>
                       <p className="text-xl sm:text-2xl font-bold">
-                        {profile.stats.totalElevation.toLocaleString()} ft
+                        {currentProfile.stats.totalElevation.toLocaleString()} ft
                       </p>
                     </motion.div>
                     <motion.div
@@ -439,7 +565,7 @@ export default function ProfilePage() {
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">Longest Hike</span>
                       </div>
-                      <p className="text-xl sm:text-2xl font-bold">{profile.stats.longestHike} mi</p>
+                      <p className="text-xl sm:text-2xl font-bold">{currentProfile.stats.longestHike} mi</p>
                     </motion.div>
                     <motion.div
                       className="space-y-1"
@@ -452,7 +578,7 @@ export default function ProfilePage() {
                         <span className="text-sm text-muted-foreground">Highest Elevation</span>
                       </div>
                       <p className="text-xl sm:text-2xl font-bold">
-                        {profile.stats.highestElevation.toLocaleString()} ft
+                        {currentProfile.stats.highestElevation.toLocaleString()} ft
                       </p>
                     </motion.div>
                     <motion.div
@@ -465,7 +591,7 @@ export default function ProfilePage() {
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">Total Time</span>
                       </div>
-                      <p className="text-xl sm:text-2xl font-bold">{profile.stats.totalTime}</p>
+                      <p className="text-xl sm:text-2xl font-bold">{currentProfile.stats.totalTime}</p>
                     </motion.div>
                   </div>
                 </CardContent>
@@ -490,7 +616,7 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent className="px-4 sm:px-6">
                   <div className="grid gap-8 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 py-4">
-                    {profile.badges.map((badge) => (
+                    {currentProfile.badges.map((badge) => (
                       <CartoonBadge key={badge.id} {...badge} onClick={() => unlockBadge(badge)} />
                     ))}
                   </div>
@@ -499,15 +625,55 @@ export default function ProfilePage() {
             </TabsContent>
 
             {/* Rewards Tab */}
-            <TabsContent value="rewards" className="mt-6">
+            <TabsContent value="rewards" className="mt-6 space-y-6">
               <Card>
                 <CardHeader className="px-4 sm:px-6">
                   <CardTitle className="text-lg sm:text-xl">Unlocked Rewards</CardTitle>
                   <CardDescription>Special features and perks you've earned</CardDescription>
                 </CardHeader>
                 <CardContent className="px-4 sm:px-6">
-                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    {profile.rewards.map((reward) => {
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                    {/* Recommendations Section */}
+                    <div className="col-span-full">
+                      <h3 className="text-lg font-semibold mb-4">AI-Powered Recommendations</h3>
+                      {loadingRecs ? (
+                        <div className="flex items-center justify-center h-32">
+                          <p>Loading recommendations...</p>
+                        </div>
+                      ) : recommendations.length > 0 ? (
+                        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                          {recommendations.map((rec, index) => (
+                            <Card key={index}>
+                              <CardHeader>
+                                <CardTitle className="text-base capitalize">
+                                  {rec.activityType.replace('-', ' ')}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className="text-sm text-muted-foreground">
+                                  {rec.reason}
+                                </p>
+                                <div className="mt-2 flex items-center justify-between">
+                                  <span className="text-xs text-muted-foreground">
+                                    Confidence: {(rec.confidence * 100).toFixed(0)}%
+                                  </span>
+                                  <Button variant="outline" size="sm">
+                                    View Trail
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground">
+                          No recommendations available yet. Complete more hikes to get personalized suggestions.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Existing Rewards */}
+                    {currentProfile.rewards.map((reward) => {
                       const handleUseReward = () => {
                         if (!reward.unlocked) {
                           upgradeToPremium()
@@ -538,7 +704,7 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent className="px-4 sm:px-6">
                   <div className="space-y-4">
-                    {profile.devices.map((device, index) => (
+                    {currentProfile.devices.map((device, index) => (
                       <motion.div
                         key={index}
                         className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-4 last:border-0 last:pb-0 gap-3 sm:gap-0"

@@ -1,81 +1,105 @@
-# TrailQuest - Outdoor Adventure Tracker
+# TrailQuest - Adventure Tracking Application
 
-## Overview
-TrailQuest is a Next.js application designed to help outdoor enthusiasts track and share their adventures. The app features hiking tracking, adventure logging, leaderboards, and achievement badges.
+TrailQuest is a gamified adventure tracking application built with Next.js that helps outdoor enthusiasts log and share their hiking, climbing, kayaking, and other outdoor adventures while earning achievements and rewards.
 
 ## Features
-- Real-time adventure tracking
-- Social feed of recent adventures
-- Achievement system with badges
-- Leaderboard rankings
-- Specialized side quests (rock climbing, kayaking, etc.)
 
-## Recent Updates
-- Added adventure feed preview section to main page
-- Integrated Clerk authentication with user avatars
-- Implemented like/comment functionality
+- **Adventure Logging**: Track and log various outdoor activities
+- **Achievements System**: Earn badges and rewards for completing challenges
+- **Recommendation Engine**: Get personalized adventure recommendations
+- **Leaderboard**: Compete with friends on adventure stats
+- **Side Quests**: Special challenges for activities like rock climbing, kayaking, etc.
+- **Profile Tracking**: View your adventure history and stats
+- **Premium Features**: Additional perks for premium members
 
-## Tech Stack
-- Next.js 14 (App Router)
-- TypeScript
-- Tailwind CSS
-- Clerk Authentication
-- shadcn/ui components
+## Installation
 
-## Technical Details
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/trailquest.git
+cd trailquest
+```
 
-### Authentication
-- Uses Clerk for user authentication
-- JWT token handling through middleware
-- Protected routes for logged-in users only
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
 
-### Database
-- PostgreSQL for persistent data storage
-- Prisma ORM for database operations
-- Models include:
-  - User profiles
-  - Adventure logs
-  - Achievements
-  - Leaderboard entries
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-### API Endpoints
-- `/api/adventures` - CRUD operations for adventures
-- `/api/leaderboard` - GET leaderboard data
-- `/api/achievements` - User achievement tracking
+4. Set up database:
+```bash
+npx prisma migrate dev
+```
 
-### State Management
-- React Context for theme preferences
-- Server components for data fetching
-- Client-side state for UI interactions
+5. Run the development server:
+```bash
+npm run dev
+```
 
-### Key Dependencies
-- `@clerk/nextjs` - Authentication
-- `lucide-react` - Icons
-- `tailwind-merge` - Dynamic class handling
-- `react-hook-form` - Form management
-- `zod` - Data validation
+## Configuration
 
-### Performance Optimizations
-- Dynamic imports for heavy components
-- Lazy loading for images
-- Route-based code splitting
+Required environment variables (in `.env`):
+```
+DATABASE_URL=your_database_url
+NEXTAUTH_SECRET=your_secret_key
+NEXTAUTH_URL=http://localhost:3000
+AWS_ACCESS_KEY_ID=your_aws_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret
+AWS_REGION=your_aws_region
+S3_BUCKET_NAME=your_bucket_name
+OPENAI_API_KEY=your_openai_key (for recommendations)
+```
 
-## Getting Started
+## API Endpoints
 
-### Prerequisites
-- Node.js 18+
-- npm/pnpm/yarn
-- Clerk account for authentication
+### Adventure Posts
+- `POST /api/adventure-posts` - Create new adventure post
+- `GET /api/adventure-posts` - Get adventure posts
 
-### Installation
-1. Clone the repository
-2. Run `pnpm install`
-3. Set up environment variables (see .env.example)
-4. Run `pnpm dev`
+### Recommendations
+- `GET /api/recommendations` - Get adventure recommendations
+- `POST /api/recommendations/interact` - Log recommendation interactions
+
+### Upload
+- `POST /api/upload` - Upload media files
+
+## Technology Stack
+
+- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API routes
+- **Database**: PostgreSQL (via Prisma)
+- **Authentication**: NextAuth.js
+- **Storage**: AWS S3
+- **AI**: OpenAI (for recommendations)
+- **UI Components**: Shadcn/ui
 
 ## Project Structure
-Key directories:
-- `app/` - Next.js route handlers and pages
-- `components/` - Reusable UI components
-- `backend/` - Server-side logic and API routes
-- `public/` - Static assets
+
+```
+trailquest/
+├── app/                  # Next.js app router pages
+├── backend/              # Backend services and controllers
+├── components/           # React components
+├── lib/                  # Shared utilities and services
+├── prisma/               # Database schema and migrations
+├── public/               # Static assets
+└── styles/               # Global styles
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+

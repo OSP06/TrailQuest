@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -11,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Camera, MapPin, Mountain, Plus, X } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/components/ui/use-toast"
 
 interface CreatePostDialogProps {
   open: boolean
@@ -28,16 +27,52 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
     elevation: "",
     time: "",
   })
+  const { toast } = useToast()
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!content.trim()) return
 
     setIsSubmitting(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      onOpenChange(false)
+    try {
+      // Create the adventure post
+      const postResponse = await fetch('/api/adventure-posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: `${activityType} Adventure`,
+          description: content,
+          activityType,
+          location
+        })
+      })
+
+      if (!postResponse.ok) {
+        throw new Error('Failed to create post')
+      }
+
+      const post = await postResponse.json()
+
+      // Upload photos if any
+      if (photos.length > 0) {
+        for (const photo of photos) {
+          const blob = await fetch(photo).then(r => r.blob())
+          const formData = new FormData()
+          formData.append('file', blob)
+          formData.append('postId', post.id)
+
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          })
+
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload image')
+          }
+        }
+      }
 
       // Reset form
       setContent("")
@@ -50,15 +85,27 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         time: "",
       })
 
+      // Close dialog
+      onOpenChange(false)
+
       // Show success message
-      alert("Adventure shared successfully!")
-    }, 1000)
+      toast({
+        title: "Adventure shared!",
+        description: "Your adventure has been posted successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to share your adventure. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      // In a real app, you would upload these to a server
-      // Here we're just creating object URLs for preview
       const newPhotos = Array.from(e.target.files).map((file) => URL.createObjectURL(file))
       setPhotos((prev) => [...prev, ...newPhotos])
     }
@@ -346,4 +393,3 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
     </Dialog>
   )
 }
-
