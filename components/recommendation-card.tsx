@@ -13,6 +13,11 @@ interface Recommendation {
   description: string
   difficulty: 'easy' | 'medium' | 'hard'
   xpReward: number
+  location?: {
+    lat: number
+    lng: number
+    name?: string
+  }
 }
 
 interface Achievement {

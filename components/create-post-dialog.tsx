@@ -36,6 +36,28 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
 
     try {
       // Create the adventure post
+      // Validate required stats based on activity type
+      let requiredStats: string[] = []
+      switch (activityType) {
+        case 'Hiking':
+          requiredStats = ['distance', 'elevation', 'time']
+          break
+        case 'Rock Climbing':
+          requiredStats = ['grade', 'style']
+          break
+        case 'Kayaking':
+          requiredStats = ['distance', 'time']
+          break
+        case 'Cliff Jumping':
+          requiredStats = ['height']
+          break
+      }
+
+      const missingStats = requiredStats.filter(stat => !stats[stat]?.trim())
+      if (missingStats.length > 0) {
+        throw new Error(`Please fill in: ${missingStats.join(', ')}`)
+      }
+
       const postResponse = await fetch('/api/adventure-posts', {
         method: 'POST',
         headers: {
@@ -45,7 +67,8 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
           title: `${activityType} Adventure`,
           description: content,
           activityType,
-          location
+          location,
+          stats
         })
       })
 
@@ -96,7 +119,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to share your adventure. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to share your adventure. Please try again.",
         variant: "destructive"
       })
     } finally {

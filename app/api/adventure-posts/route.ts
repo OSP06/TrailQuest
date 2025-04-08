@@ -78,7 +78,7 @@ export async function POST(request: Request) {
         description,
         activityType,
         location,
-        stats,
+        stats: stats || {}, // Make stats optional with empty object default
         userId: user.id,
         likes: 0,
         comments: 0
@@ -87,8 +87,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json(post)
   } catch (error) {
+    console.error('Error creating adventure post:', error)
     return NextResponse.json(
-      { error: 'Failed to create post' },
+      { 
+        error: 'Failed to create post',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     )
   }
