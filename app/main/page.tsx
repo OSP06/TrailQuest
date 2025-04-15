@@ -89,10 +89,12 @@ export default function Home() {
               </div>
             </CardContent>
             <CardFooter className="px-4 sm:px-6">
-              <Button variant="outline" size="sm" className="gap-1">
-                <span>Track Now</span>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Link href="/track/tracking_hiking">
+                <Button variant="outline" size="sm" className="gap-1">
+                  <span>Track Now</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
 
@@ -125,10 +127,12 @@ export default function Home() {
               </div>
             </CardContent>
             <CardFooter className="px-4 sm:px-6">
-              <Button variant="outline" size="sm" className="gap-1 w-full sm:w-auto">
-                <span>View All Hiking Stats</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              <Link href="/hiking">
+                <Button variant="outline" size="sm" className="gap-1 w-full sm:w-auto">
+                  <span>View All Hiking Stats</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         </div>
@@ -274,11 +278,7 @@ export default function Home() {
                 </CardHeader>
                 <CardContent className="pb-2 px-4 sm:px-6">
                   <div className="aspect-video w-full rounded-md bg-muted/50 overflow-hidden">
-                    <img
-                      src="/placeholder.svg?height=200&width=400"
-                      alt="Eagle Peak Trail"
-                      className="h-full w-full object-cover"
-                    />
+                    <MapComponent />
                   </div>
                 </CardContent>
                 <CardFooter className="px-4 sm:px-6">
@@ -305,11 +305,7 @@ export default function Home() {
                         <p className="text-sm font-medium mt-2">Premium Feature</p>
                       </div>
                     </div>
-                    <img
-                      src="/placeholder.svg?height=200&width=400"
-                      alt="Hidden Valley Loop"
-                      className="h-full w-full object-cover blur-sm"
-                    />
+                    <MapComponent/>
                   </div>
                 </CardContent>
                 <CardFooter className="px-4 sm:px-6">
@@ -336,11 +332,7 @@ export default function Home() {
                         <p className="text-sm font-medium mt-2">Premium Feature</p>
                       </div>
                     </div>
-                    <img
-                      src="/placeholder.svg?height=200&width=400"
-                      alt="Sunset Ridge"
-                      className="h-full w-full object-cover blur-sm"
-                    />
+                    <MapComponent/>
                   </div>
                 </CardContent>
                 <CardFooter className="px-4 sm:px-6">
@@ -367,11 +359,7 @@ export default function Home() {
                         <p className="text-sm font-medium mt-2">Premium Feature</p>
                       </div>
                     </div>
-                    <img
-                      src="/placeholder.svg?height=200&width=400"
-                      alt="Sunset Ridge"
-                      className="h-full w-full object-cover blur-sm"
-                    />
+                    <MapComponent/>
                   </div>
                 </CardContent>
                 <CardFooter className="px-4 sm:px-6">

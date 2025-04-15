@@ -1,13 +1,49 @@
-import { Award, ChevronRight, Filter, MapPin, Mountain, Search } from "lucide-react"
-import { BackButton } from "@/components/back-button"
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
+import { Award, ChevronRight, Filter, MapPin, Mountain, Search, Timer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { MapComponent } from "@/components/map-component"
+import { BackButton } from "@/components/back-button"
 
 export default function RockClimbingQuestPage() {
+  const router = useRouter()
+  const [isTracking, setIsTracking] = useState(false)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (isTracking) {
+      timerRef.current = setInterval(() => {
+        setElapsedTime(prev => prev + 1)
+      }, 1000)
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+    }
+  }, [isTracking])
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`
+  }
+
+  const startTracking = () => {
+    router.push("/track/track_rock_climb")
+  }
+
   // Sample rock climbing quests
   const quests = [
     {
@@ -63,15 +99,15 @@ export default function RockClimbingQuestPage() {
 
   return (
     <div className="container max-w-screen-xl space-y-8 py-6 md:py-10">
-      <BackButton className="mt-4" />
+      <BackButton className="mt-4" path="/main" />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Rock Climbing Quests</h1>
           <p className="text-muted-foreground">Complete quests to earn XP and badges</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={startTracking}>
           <Mountain className="h-4 w-4" />
-          <span>Log Climb</span>
+          <span>Start Climb</span>
         </Button>
       </div>
 
@@ -159,11 +195,7 @@ export default function RockClimbingQuestPage() {
           {locations.map((location) => (
             <Card key={location.id}>
               <div className="aspect-video w-full overflow-hidden">
-                <img
-                  src={location.image || "/placeholder.svg"}
-                  alt={location.name}
-                  className="h-full w-full object-cover"
-                />
+              <MapComponent/>
               </div>
               <CardHeader className="pb-2">
                 <CardTitle>{location.name}</CardTitle>
@@ -200,7 +232,8 @@ export default function RockClimbingQuestPage() {
                 <Button variant="outline" size="sm">
                   View Routes
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm"  
+                  onClick={() => router.push('/track/track_rock_climb')}>
                   Log Climb
                 </Button>
               </CardFooter>

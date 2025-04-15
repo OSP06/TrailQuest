@@ -25,6 +25,10 @@ export default function HikingQuestPage() {
     location: string
     image: string
     averageTime: number
+    description?: string
+    reward?: string
+    progress?: string
+    locations?: string[]
   }
 
   const [selectedTrail, setSelectedTrail] = useState<Trail | null>(null)
@@ -109,7 +113,7 @@ export default function HikingQuestPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Hiking</h1>
           <p className="text-muted-foreground">Discover trails, track your progress, and earn rewards</p>
         </div>
-        <Button className="gap-2 w-full sm:w-auto" onClick={() => router.push('/track')}>
+        <Button className="gap-2 w-full sm:w-auto" onClick={() => router.push('/track/tracking_hiking')}>
           <Mountain className="h-4 w-4" />
           <span>Start Hiking</span>
         </Button>
@@ -165,7 +169,25 @@ export default function HikingQuestPage() {
                 </div>
               </CardContent>
               <CardFooter className="px-4 sm:px-6">
-                <Button variant="outline" size="sm" className="w-full gap-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full gap-1"
+                  onClick={() => setSelectedTrail({
+                    id: quest.id,
+                    name: quest.title,
+                    distance: 0,
+                    elevation: 0,
+                    difficulty: "",
+                    location: "",
+                    image: "/placeholder.svg",
+                    averageTime: 0,
+                    description: quest.description,
+                    reward: quest.reward,
+                    progress: `${quest.progress}/${quest.total}`,
+                    locations: quest.locations
+                  })}
+                >
                   <span>View Details</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -210,7 +232,7 @@ export default function HikingQuestPage() {
           {trails.map((trail) => (
             <Card key={trail.id}>
               <div className="aspect-video w-full overflow-hidden">
-                <img src={trail.image || "/placeholder.svg"} alt={trail.name} className="h-full w-full object-cover" />
+                <MapComponent />
               </div>
               <CardHeader className="pb-2 px-4 sm:px-6">
                 <CardTitle className="text-base sm:text-lg">{trail.name}</CardTitle>
@@ -250,7 +272,7 @@ export default function HikingQuestPage() {
                   variant="outline" 
                   size="sm" 
                   className="w-full"
-                  onClick={() => router.push('/track')}
+                  onClick={() => router.push('/track/tracking_hiking')}
                 >
                   Start Hike
                 </Button>

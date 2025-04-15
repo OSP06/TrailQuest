@@ -67,7 +67,7 @@ export default function CliffJumpingQuestPage() {
 
   return (
     <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10">
-      <BackButton className="mt-4" />
+      <BackButton className="mt-4" path="/main" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <div>
@@ -172,11 +172,7 @@ export default function CliffJumpingQuestPage() {
           {locations.map((location) => (
             <Card key={location.id}>
               <div className="aspect-video w-full overflow-hidden">
-                <img
-                  src={location.image || "/placeholder.svg"}
-                  alt={location.name}
-                  className="h-full w-full object-cover"
-                />
+              <MapComponent/>
               </div>
               <CardHeader className="pb-2 px-4 sm:px-6">
                 <CardTitle className="text-base sm:text-lg">{location.name}</CardTitle>

@@ -162,11 +162,7 @@ export default function KayakingQuestPage() {
           {locations.map((location) => (
             <Card key={location.id}>
               <div className="aspect-video w-full overflow-hidden">
-                <img
-                  src={location.image || "/placeholder.svg"}
-                  alt={location.name}
-                  className="h-full w-full object-cover"
-                />
+                <MapComponent/>
               </div>
               <CardHeader className="pb-2">
                 <CardTitle>{location.name}</CardTitle>
@@ -203,8 +199,10 @@ export default function KayakingQuestPage() {
                 <Button variant="outline" size="sm">
                   View Details
                 </Button>
-                <Button variant="outline" size="sm">
-                  Start Tracking
+                <Button  variant="outline" 
+                  size="sm" 
+                  onClick={() => router.push('/track/tracking_kayaking')}>
+                  Start Kayaking
                 </Button>
               </CardFooter>
             </Card>

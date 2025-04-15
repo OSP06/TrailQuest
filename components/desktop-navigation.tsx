@@ -159,7 +159,7 @@ export function DesktopNavigation() {
       <div className="border-t p-4">
         <div className={cn("flex items-center gap-4", isCollapsed && "justify-center")}>
           <Avatar>
-            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
+            <AvatarImage src="/profile.jpg?height=40&width=40" alt="User" />
             <AvatarFallback>TQ</AvatarFallback>
           </Avatar>
           {!isCollapsed && (
