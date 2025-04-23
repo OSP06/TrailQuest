@@ -13,8 +13,24 @@ import { useUser } from "@clerk/nextjs"
 
 export default function Home() {
 
-  const User = useUser()
-  console.log(User)
+  const { isLoaded, user } = useUser()
+  
+  if (!isLoaded) {
+    return (
+      <div className="flex">
+        <DesktopNavigation />
+        <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 flex-1">
+          <div className="flex flex-col gap-4 md:flex-row">
+            <div className="flex-1 space-y-4">
+              <div className="h-10 w-64 bg-gray-200 rounded animate-pulse" />
+              {/* Loading skeletons for other content */}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex">
       <DesktopNavigation />
@@ -22,7 +38,7 @@ export default function Home() {
         <div className="flex flex-col gap-4 md:flex-row">
         <div className="flex-1 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Welcome back, {User.user?.fullName || 'Adventurer'}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Welcome back, {user?.fullName || 'Adventurer'}</h1>
             <Badge variant="outline" className="gap-1 w-fit">
               <Zap className="h-3 w-3 text-yellow-500" />
               <span>Level 12</span>

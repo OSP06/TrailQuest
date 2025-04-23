@@ -18,6 +18,23 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, path: false };
+    return config;
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: process.env.NEXT_PUBLIC_FLASK_API_URL 
+          ? `${process.env.NEXT_PUBLIC_FLASK_API_URL}/api/:path*`
+          : 'http://localhost:5000/api/:path*',
+      },
+    ]
+  },
+  env: {
+    NEXT_PUBLIC_FLASK_API_URL: process.env.NEXT_PUBLIC_FLASK_API_URL || '',
+  },
 }
 
 mergeConfig(nextConfig, userConfig)

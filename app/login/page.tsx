@@ -52,10 +52,11 @@ export default function LoginPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <SignIn
-            afterSignInUrl="/main"
-            fallbackRedirectUrl="/main" // Replaced afterSignUpUrl
+            path="/login"
+            fallbackRedirectUrl="/main" 
+            forceRedirectUrl="/main"
             signUpUrl="/sign-up"
-            routing="hash"
+            routing="path"
             appearance={{
               elements: {
                 rootBox: "w-full",

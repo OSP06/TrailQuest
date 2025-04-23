@@ -49,21 +49,21 @@ export function AnimatedLogo({ size = "md", animated = true, onAnimationComplete
     { 
       type: 'scale', 
       duration: 0.6, 
-      from: animated ? { scale: 0, opacity: 0 } : undefined,
+      from: { scale: 0, opacity: 0 },
       to: { scale: 1, opacity: 1 }
     },
     { 
       type: 'scale', 
       duration: 0.6, 
       delay: 0.1, 
-      from: animated ? { scale: 0, opacity: 0 } : undefined,
+      from: { scale: 0, opacity: 0 },
       to: { scale: 1, opacity: 1 }
     },
     { 
       type: 'scale', 
       duration: 0.6, 
       delay: 0.2, 
-      from: animated ? { scale: 0, opacity: 0 } : undefined,
+      from: { scale: 0, opacity: 0 },
       to: { scale: 1, opacity: 1 }
     }
   ])
@@ -72,7 +72,7 @@ export function AnimatedLogo({ size = "md", animated = true, onAnimationComplete
     type: 'fade',
     duration: 0.5,
     delay: 0.4,
-    from: animated ? { y: 20, opacity: 0 } : undefined,
+    from: { y: 20, opacity: 0 },
     to: { y: 0, opacity: 1 }
   })
 
@@ -90,8 +90,8 @@ export function AnimatedLogo({ size = "md", animated = true, onAnimationComplete
       to: { rotate: -360 }
     }),
     items: createAnimationSequence([
-      { type: 'scale', duration: 0.4, delay: 0.6, from: animated ? { scale: 0, opacity: 0 } : undefined },
-      { type: 'scale', duration: 0.4, delay: 0.7, from: animated ? { scale: 0, opacity: 0 } : undefined }
+      { type: 'scale', duration: 0.4, delay: 0.6, from: { scale: 0, opacity: 0 } },
+      { type: 'scale', duration: 0.4, delay: 0.7, from: { scale: 0, opacity: 0 } }
     ])
   }
 
@@ -99,7 +99,7 @@ export function AnimatedLogo({ size = "md", animated = true, onAnimationComplete
     type: 'scale',
     duration: 0.8,
     delay: 0.3,
-    from: animated ? { scale: 0, opacity: 0 } : { scale: 1.5, opacity: 0.2 },
+    from: { scale: 0, opacity: 0 },
     to: { scale: 1.5, opacity: 0.2 }
   })
 

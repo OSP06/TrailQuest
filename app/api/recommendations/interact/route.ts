@@ -11,7 +11,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { activityId, interactionType } = await request.json()
+    const body = await request.json()
+    const activityId = Number(body.activityId)
+    const interactionType = body.interactionType
     
     if (!['accepted', 'rejected', 'ignored'].includes(interactionType)) {
       return NextResponse.json(
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
     }
 
     await RecommendationService.logInteraction(
-      user.id,
+      Number(user.id),
       activityId,
       interactionType
     )

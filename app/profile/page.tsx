@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { flaskApiClient } from "@/lib/services/flaskApi"
 import type { JSX } from 'react'
+import type { Profile } from '@/types/flask'
 import { fetchRecommendations } from "@/lib/api"
 import { toast } from "@/components/ui/use-toast"
 import { motion } from "framer-motion"
@@ -52,30 +54,6 @@ export default function ProfilePage() {
     confidence: number
   }
 
-  interface Profile {
-    name: string
-    username: string
-    avatar: string
-    level: number
-    xp: number
-    xpToNextLevel: number
-    joinDate: string
-    location: string
-    bio: string
-    stats: {
-      totalHikes: number
-      totalDistance: number
-      totalElevation: number
-      longestHike: number
-      highestElevation: number
-      averagePace: string
-      totalTime: string
-    }
-    badges: Badge[]
-    rewards: Reward[]
-    devices: Device[]
-  }
-
   interface Badge {
     id: string
     name: string
@@ -124,11 +102,10 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch('/api/profile')
-        if (!response.ok) {
-          throw new Error('Failed to fetch profile')
+        const { status, data, error } = await flaskApiClient.getProfile()
+        if (status === 'error' || !data) {
+          throw new Error(error || 'Failed to fetch profile')
         }
-        const data = await response.json()
         setProfile(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error')
@@ -409,7 +386,41 @@ export default function ProfilePage() {
     )
   }
 
+  // Type guard to check if profile is from API or fallback
+  function isApiProfile(profile: Profile | any): profile is Profile {
+    return 'id' in profile && 'email' in profile && 'profile' in profile
+  }
+
   const currentProfile = profile || fallbackProfile
+
+  // Helper functions to safely access profile properties
+  const getAvatar = () => isApiProfile(currentProfile) 
+    ? currentProfile.profile?.avatarUrl 
+    : currentProfile.avatar
+
+  const getName = () => isApiProfile(currentProfile)
+    ? `${currentProfile.profile?.firstName || ''} ${currentProfile.profile?.lastName || ''}`.trim()
+    : currentProfile.name
+
+  const getUsername = () => isApiProfile(currentProfile)
+    ? currentProfile.email.split('@')[0]
+    : currentProfile.username
+
+  const getBio = () => isApiProfile(currentProfile)
+    ? currentProfile.profile?.bio
+    : currentProfile.bio
+
+  const getJoinDate = () => isApiProfile(currentProfile)
+    ? new Date(currentProfile.createdAt || '').toLocaleDateString()
+    : currentProfile.joinDate
+
+  const getLocation = () => isApiProfile(currentProfile)
+    ? currentProfile.profile?.location
+    : currentProfile.location
+
+  const getXpToNextLevel = () => isApiProfile(currentProfile)
+    ? (currentProfile.level + 1) * 1000 - currentProfile.xp
+    : currentProfile.xpToNextLevel
 
   return (
     <div className="container px-4 sm:px-6 max-w-screen-xl space-y-6 sm:space-y-8 py-4 sm:py-6 md:py-10 relative">

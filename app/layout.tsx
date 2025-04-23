@@ -25,7 +25,7 @@ export default function RootLayout({
           colorPrimary: "#22c55e"
         }
       }}
-      signInFallbackRedirectUrl="/main"
+      signInForceRedirectUrl="/main"
       signUpFallbackRedirectUrl="/onboarding"
     >
       <html lang="en" suppressHydrationWarning>

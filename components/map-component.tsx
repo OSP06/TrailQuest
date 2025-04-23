@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { ActivityType, getActivityAnimations } from "../lib/animationUtils"
+import { flaskApiClient } from "../lib/services/flaskApi"
 
 interface LayerConfig {
   id: string;
@@ -59,6 +60,9 @@ export function MapComponent({
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
   const [memoryUsage, setMemoryUsage] = useState<number>(0);
   const [frameRate, setFrameRate] = useState<number>(60);
+  const [trails, setTrails] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Monitor memory usage
   const monitorMemory = useCallback(() => {
@@ -366,8 +370,71 @@ export function MapComponent({
         const perfEnd = performance.now();
         console.log(`Map initialized in ${(perfEnd - perfStart).toFixed(2)}ms`);
 
-        // Original trail path code
-        map.current?.addSource('trail', {
+        // Add trails from API
+        if (trails.length > 0) {
+          map.current?.addSource('trails', {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: trails.map(trail => ({
+                type: 'Feature',
+                properties: {
+                  name: trail.name,
+                  difficulty: trail.difficulty
+                },
+                geometry: {
+                  type: 'LineString',
+                  coordinates: trail.coordinates
+                }
+              }))
+            }
+          });
+
+          map.current?.addLayer({
+            id: 'trails',
+            type: 'line',
+            source: 'trails',
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': [
+                'match',
+                ['get', 'difficulty'],
+                'easy', '#2b9348',
+                'moderate', '#f9c74f',
+                'hard', '#f8961e',
+                'expert', '#f94144',
+                '#6366f1' // default
+              ],
+              'line-width': 4
+            }
+          });
+
+          // Add trail labels
+          map.current?.addLayer({
+            id: 'trail-labels',
+            type: 'symbol',
+            source: 'trails',
+            layout: {
+              'text-field': ['get', 'name'],
+              'text-font': ['Open Sans Semibold'],
+              'text-size': 12,
+              'text-offset': [0, 1],
+              'text-anchor': 'top'
+            },
+            paint: {
+              'text-color': '#ffffff',
+              'text-halo-color': '#000000',
+              'text-halo-width': 1
+            }
+          });
+        }
+
+        // Add manual trail path if provided
+        if (trailPath && trailPath.length > 0) {
+          map.current?.addSource('manual-trail', {
             type: 'geojson',
             data: {
               type: 'Feature',
@@ -377,12 +444,12 @@ export function MapComponent({
                 coordinates: trailPath.map(point => [point.lng, point.lat])
               }
             }
-          })
+          });
 
           map.current?.addLayer({
-            id: 'trail',
+            id: 'manual-trail',
             type: 'line',
-            source: 'trail',
+            source: 'manual-trail',
             layout: {
               'line-join': 'round',
               'line-cap': 'round'
@@ -391,7 +458,8 @@ export function MapComponent({
               'line-color': '#6366f1',
               'line-width': 4
             }
-          })
+          });
+        }
         })
       }
 
@@ -416,6 +484,27 @@ export function MapComponent({
   useEffect(() => {
     manageLayers();
   }, [qualityMode, batteryLevel, memoryUsage, manageLayers])
+
+  // Fetch trails from Flask API
+  useEffect(() => {
+    const fetchTrails = async () => {
+      setLoading(true);
+      try {
+        const response = await flaskApiClient.getTrails();
+        if (response.status === 'success' && response.data) {
+          setTrails(response.data);
+        } else {
+          setError(response.error || 'Failed to fetch trails');
+        }
+      } catch (err) {
+        setError('Network error while fetching trails');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrails();
+  }, []);
 
   return <div ref={mapContainer} className="h-full w-full" />
 }

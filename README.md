@@ -1,5 +1,40 @@
 # TrailQuest - Adventure Tracking Application
 
+## Development Setup
+
+### Backend (Flask)
+
+1. Install Docker and Docker Compose
+2. Navigate to project root
+3. Run: `docker-compose up -d`
+4. The Flask API will be available at `http://localhost:5000`
+
+### Frontend (Next.js)
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+3. Run development server:
+```bash
+npm run dev
+```
+
+The frontend will be available at `http://localhost:3000`
+
+### Environment Variables
+
+Add these to your `.env.local`:
+```
+NEXT_PUBLIC_FLASK_API_URL=http://localhost:5000
+```
+
 TrailQuest is a gamified adventure tracking application built with Next.js that helps outdoor enthusiasts log and share their hiking, climbing, kayaking, and other outdoor adventures while earning achievements and rewards.
 
 ## Features
@@ -102,4 +137,3 @@ trailquest/
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
