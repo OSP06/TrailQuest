@@ -58,14 +58,14 @@ class FlaskApiClient {
   async getTrails(): Promise<ApiResponse<Trail[]>> {
     return this.request({
       method: 'GET',
-      url: '/api/maps/trails'
+      url: '/api/trails'
     });
   }
 
   async getTrailDetails(trailId: string): Promise<ApiResponse<Trail>> {
     return this.request({
       method: 'GET',
-      url: `/api/maps/trails/${trailId}`
+      url: `/api/trails/${trailId}`
     });
   }
 
@@ -86,10 +86,11 @@ class FlaskApiClient {
   }
 
   // Profile Service Methods
-  async getProfile(): Promise<ApiResponse<Profile>> {
+  async getProfile(userId: string): Promise<ApiResponse<Profile>> {
     return this.request({
       method: 'GET',
-      url: '/api/profile'
+      url: '/api/profile',
+      params: { userId }
     });
   }
 
@@ -101,7 +102,7 @@ class FlaskApiClient {
     });
   }
 
-  async getAchievements(): Promise<ApiResponse<Array<{
+  async getAchievements(userId: string): Promise<ApiResponse<Array<{
     achievement: {
       id: number;
       name: string;
@@ -112,7 +113,21 @@ class FlaskApiClient {
   }>>> {
     return this.request({
       method: 'GET',
-      url: '/api/profile/achievements'
+      url: '/api/profile/achievements',
+      params: { userId }
+    });
+  }
+
+  async getAdventurePosts(): Promise<ApiResponse<Array<{
+    id: string;
+    title: string;
+    description: string;
+    activityType: string;
+    images: string[];
+  }>>> {
+    return this.request({
+      method: 'GET',
+      url: '/api/posts'
     });
   }
 }
