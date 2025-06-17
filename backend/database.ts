@@ -1,49 +1,69 @@
-import { MongoClient, ObjectId } from 'mongodb';
-import { config } from './config.js';
-
-let client: MongoClient;
-
-const toObjectId = (id: string) => new ObjectId(id);
+import { prisma } from '../lib/prisma';
 
 export const Database = {
   async connect() {
-    client = await MongoClient.connect(config.databaseUrl);
+    // Connection is handled by Prisma client
   },
 
-  async getUserLocation(userId: string) {
-    const db = client.db();
-    const user = await db.collection('users').findOne({ _id: toObjectId(userId) });
-    return user?.location || 'unknown';
+  async getUserLocation(userId: number) {
+    const profile = await prisma.userProfile.findUnique({
+      where: { userId },
+      select: { location: true }
+    });
+    return profile?.location || 'unknown';
   },
 
-  async getUserPreferences(userId: string) {
-    const db = client.db();
-    const user = await db.collection('users').findOne({ _id: toObjectId(userId) });
-    return user?.preferences || [];
+  async getUserPreferences(userId: number) {
+    const prefs = await prisma.preference.findMany({
+      where: { userId },
+      select: { key: true, value: true }
+    });
+    return prefs.map(p => ({ [p.key]: p.value }));
   },
 
-  async getRecentActivities(userId: string) {
-    const db = client.db();
-    const activities = await db.collection('activities')
-      .find({ userId: toObjectId(userId) })
-      .sort({ timestamp: -1 })
-      .limit(5)
-      .toArray();
-    return activities.map(a => a.activityId);
+  async getRecentActivities(userId: number) {
+    const activities = await prisma.activity.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: { type: true, data: true }
+    });
+    return activities.map(a => ({
+      type: a.type,
+      ...(a.data as object)
+    }));
   },
 
-  async getUserFeatures(userId: string) {
-    const db = client.db();
-    const user = await db.collection('users').findOne({ _id: toObjectId(userId) });
+  async getUserFeatures(userId: number) {
+    const [user, profile, activities] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        include: { preferences: true }
+      }),
+      prisma.userProfile.findUnique({
+        where: { userId }
+      }),
+      prisma.activity.findMany({
+        where: { userId }
+      })
+    ]);
+
+    const preferenceWeights = user?.preferences.reduce((acc, pref) => {
+      if (pref.key.startsWith('weight_')) {
+        acc[pref.key.replace('weight_', '')] = parseFloat(pref.value);
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
     return {
-      lastActivity: user?.lastActivity,
-      lastInteraction: user?.lastInteraction,
-      activityCount: user?.activities?.length || 0,
-      preferenceWeights: user?.preferenceWeights || {}
+      lastActivity: profile?.lastActivityId,
+      lastInteraction: profile?.lastInteraction,
+      activityCount: activities.length,
+      preferenceWeights: preferenceWeights || {}
     };
   },
 
   async close() {
-    await client.close();
+    // Connection cleanup is handled by Prisma client
   }
 };
